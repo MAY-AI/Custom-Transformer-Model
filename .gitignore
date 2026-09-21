@@ -1,0 +1,7 @@
+# Build output
+build/
+*.exe
+
+# Generated model data / checkpoints
+data/
+*.bin
