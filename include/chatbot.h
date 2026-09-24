@@ -9,7 +9,7 @@
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 
-#include <stdint.h>
+#include <stdint.h> // Fixed-width integer types: uint8_t, int8_t, etc...
 
 // Type definitions
 /////////////////////////////////////////////////////////////////
@@ -19,19 +19,19 @@ typedef struct {
     char magic[8] __attribute__((nonstring));
     uint32_t version;
     uint32_t header_bytes;
-    uint32_t vocab_size;
+    uint32_t dimension;
     uint32_t model_size;
     uint32_t float_bytes;
     uint32_t reserved;
-} token_embed_header_t;
+} file_header;
 
 // Type checks
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 
 _Static_assert(
-    sizeof(token_embed_header_t) == 32,
-    "Token embed header must be 32 bytes"
+    sizeof(file_header) == 32,
+    "File headers must be 32 bytes"
 );
 
 // Global variables
@@ -49,18 +49,31 @@ _Static_assert(
 #define INPUT_LAYER_DIM  512u
 #define HIDDEN_LAYER_DIM 2048u
 #define VOCAB_SIZE       75000u
+#define MAX_SEQ_LEN      2048u
 
 // Data params
 #define TOKEN_EMBED_MAGIC   "TOKEMB01"
 #define TOKEN_EMBED_VERSION 1u
+#define POS_ENCODE_MAGIC    "POSENC01"
+#define POS_ENCODE_VERSION  1u
 
 // Function declarations
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 
+int8_t write_all(
+    const int fd,
+    const void *buffer,
+    size_t bytes
+);
 int8_t init_token_embed(
     const char *filepath,
     const uint32_t vocab_size,
+    const uint16_t model_size
+);
+int8_t init_positional_encoding(
+    const char *filepath,
+    const uint32_t max_seq_len,
     const uint16_t model_size
 );
 

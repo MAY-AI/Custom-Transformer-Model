@@ -8,12 +8,14 @@ CC = gcc
 # - Iinclude  : Tell GCC to look in the "include" folder for header files
 CFLAGS = -Wall -Wextra -Wpedantic -Iinclude
 
+# Libraries to link
+LDLIBS = -lm
+
 # List of all C source files that make up the program
-SRC = src\chatbot.c \
-      src\token_embeds.c
+SRC = $(wildcard src/*.c)
 
 # Name/location of the final executable
-TARGET = build\chatbot.exe
+TARGET = build/chatbot.exe
 
 # Tell Make that these are commands/targets, not actual files
 .PHONY: all run clean
@@ -23,12 +25,12 @@ all: $(TARGET)
 
 # Build the executable
 $(TARGET): $(SRC)
-	$(CC) $(CFLAGS) $(SRC) -o $(TARGET)
+	$(CC) $(CFLAGS) $(SRC) -o $(TARGET) $(LDLIBS)
 
 # Run the program
 run: $(TARGET)
-	.\$(TARGET)
+	./$(TARGET)
 
 # Remove the compiled executable
 clean:
-	del /Q $(TARGET) 2>NUL
+	rm -f $(TARGET)
