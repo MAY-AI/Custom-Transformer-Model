@@ -49,7 +49,7 @@ _Static_assert(
 #define INPUT_LAYER_DIM  512u
 #define HIDDEN_LAYER_DIM 2048u
 #define VOCAB_SIZE       75000u
-#define MAX_SEQ_LEN      2048u
+#define MAX_SEQ_LEN      8192u
 
 // Data params
 #define TOKEN_EMBED_MAGIC   "TOKEMB01"
