@@ -50,7 +50,6 @@ int8_t init_token_embed(
         if (errno == EEXIST) {
             return 1;
         }
-
         return -1;
     }
 

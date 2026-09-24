@@ -16,7 +16,7 @@
 /////////////////////////////////////////////////////////////////
 
 typedef struct {
-    char magic[8];
+    char magic[8] __attribute__((nonstring));
     uint32_t version;
     uint32_t header_bytes;
     uint32_t vocab_size;
@@ -38,13 +38,20 @@ _Static_assert(
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 
+// Terminal printing
+#define RED    "\x1b[31m"
+#define GREEN  "\x1b[32m"
+#define YELLOW "\x1b[33m"
+#define BLUE   "\x1b[34m"
+#define END    "\x1b[0m"
+
 // NN params
-#define INPUT_LAYER_DIM 512u
+#define INPUT_LAYER_DIM  512u
 #define HIDDEN_LAYER_DIM 2048u
-#define VOCAB_SIZE 75000u
+#define VOCAB_SIZE       75000u
 
 // Data params
-#define TOKEN_EMBED_MAGIC "TOKEMB01"
+#define TOKEN_EMBED_MAGIC   "TOKEMB01"
 #define TOKEN_EMBED_VERSION 1u
 
 // Function declarations
