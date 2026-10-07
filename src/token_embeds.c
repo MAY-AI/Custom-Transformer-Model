@@ -13,9 +13,7 @@
 /////////////////////////////////////////////////////////////////
 
 int8_t init_token_embed(
-    const char *filepath,
-    const uint32_t vocab_size,
-    const uint16_t model_size
+    const char *filepath
 ) {
     // Open and/or create file
     #ifdef _WIN32
@@ -35,8 +33,8 @@ int8_t init_token_embed(
         .magic        = TOKEN_EMBED_MAGIC,
         .version      = TOKEN_EMBED_VERSION,
         .header_bytes = sizeof(file_header),
-        .dimension    = vocab_size,
-        .model_size   = model_size,
+        .dimension    = VOCAB_SIZE,
+        .model_size   = INPUT_LAYER_DIM,
         .float_bytes  = sizeof(float),
         .reserved     = 0
     };
@@ -48,28 +46,28 @@ int8_t init_token_embed(
     }
 
     // Allocate memory for a full token embed
-    size_t row_bytes = (size_t)model_size * sizeof(float);
-    float *row = malloc(row_bytes);
-    if (row == NULL) {
+    size_t bytes_per_token = (size_t)INPUT_LAYER_DIM * sizeof(float);
+    float *token = malloc(bytes_per_token);
+    if (token == NULL) {
         close(a);
         return -1;
     }
 
-    // Fill file with random initialized values
-    for (uint32_t i = 0; i < vocab_size; i++) {
-        // Fill row buffer with random numbers between [-0.02, 0.02]
-        for (uint16_t j = 0; j < model_size; j++) {
-            row[j] = ((float)rand() / (float)RAND_MAX) * 0.04f - 0.02f;
+    // Fill file with random initialized values for each token
+    for (uint32_t i = 0; i < VOCAB_SIZE; i++) {
+        // Fill token buffer with random numbers between [-0.02, 0.02]
+        for (uint16_t j = 0; j < INPUT_LAYER_DIM; j++) {
+            token[j] = ((float)rand() / (float)RAND_MAX) * 0.04f - 0.02f;
         }
 
-        // Write row buffer
-        if (write_all(a, row, row_bytes) != 0) {
-            free(row);
+        // Write token buffer
+        if (write_all(a, token, bytes_per_token) != 0) {
+            free(token);
             close(a);
             return -1;
         }
     }
-    free(row);
+    free(token);
 
     // Close file and return
     if (close(a) != 0) {

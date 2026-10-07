@@ -14,9 +14,7 @@
 /////////////////////////////////////////////////////////////////
 
 int8_t init_positional_encoding(
-    const char *filepath,
-    const uint32_t max_seq_len,
-    const uint16_t model_size
+    const char *filepath
 ) {
     // Open and/or create file
     #ifdef _WIN32
@@ -36,8 +34,8 @@ int8_t init_positional_encoding(
         .magic        = POS_ENCODE_MAGIC,
         .version      = POS_ENCODE_VERSION,
         .header_bytes = sizeof(file_header),
-        .dimension    = max_seq_len,
-        .model_size   = model_size,
+        .dimension    = MAX_SEQ_LEN,
+        .model_size   = INPUT_LAYER_DIM,
         .float_bytes  = sizeof(float),
         .reserved     = 0
     };
@@ -49,37 +47,37 @@ int8_t init_positional_encoding(
     }
 
     // Allocate memory for one position's encoding row
-    size_t row_bytes = (size_t)model_size * sizeof(float);
-    float *row = malloc(row_bytes);
-    if (row == NULL) {
+    size_t bytes_per_encode = (size_t)INPUT_LAYER_DIM * sizeof(float);
+    float *pos_enc = malloc(bytes_per_encode);
+    if (pos_enc == NULL) {
         close(a);
         return -1;
     }
 
-    // Fill file with sinusoidal positional encodings
-    for (uint32_t i = 0; i < max_seq_len; i++) {
-        // Fill row buffer with positional encoded values
-        for (uint16_t j = 0; j < model_size; j += 2) {
+    // Fill file with sinusoidal positional encodings for each positional encode
+    for (uint32_t i = 0; i < MAX_SEQ_LEN; i++) {
+        // Fill positional encode buffer with positional encoded values
+        for (uint16_t j = 0; j < INPUT_LAYER_DIM; j += 2) {
             // Calculate angular value
-            double exponent = (double)j / (double)model_size;
+            double exponent = (double)j / (double)INPUT_LAYER_DIM;
             double denom = pow(10000.0, exponent);
             double angle = (double)i / denom;
 
             // Fill even/odd elements
-            row[j] = (float)sin(angle);
-            if ((uint32_t)(j + 1) < model_size) {
-                row[j + 1] = (float)cos(angle);
+            pos_enc[j] = (float)sin(angle);
+            if ((uint32_t)(j + 1) < INPUT_LAYER_DIM) {
+                pos_enc[j + 1] = (float)cos(angle);
             }
         }
 
         // Write row buffer
-        if (write_all(a, row, row_bytes) != 0) {
-            free(row);
+        if (write_all(a, pos_enc, bytes_per_encode) != 0) {
+            free(pos_enc);
             close(a);
             return -1;
         }
     }
-    free(row);
+    free(pos_enc);
 
     // Close file and return
     if (close(a) != 0) {

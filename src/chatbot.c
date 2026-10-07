@@ -7,13 +7,6 @@
 #include <errno.h>  // errno, EEXIST, etc...
 #include <string.h> // strerror()
 
-// Global variables
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
-
-char te_filepath[] = "./data/token_embeddings.bin";
-char pe_filepath[] = "./data/positional_encoding.bin";
-
 // Main
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
@@ -21,11 +14,12 @@ char pe_filepath[] = "./data/positional_encoding.bin";
 int main(void) {
     // Start Algorithm
     printf("\n%s----------\n----------%s\n\n", BLUE, END);
-    printf("%sStarting Algorithm:%s\n\n", GREEN, END);
+    printf("%sStarting Algorithm:%s\n\n", BLUE, END);
 
     // Check token embeds status
+    char te_filepath[] = TOK_EMB_DIR;
     printf("%sChecking token embeds...%s\n", YELLOW, END);
-    int8_t te_code = init_token_embed(te_filepath, VOCAB_SIZE, INPUT_LAYER_DIM);
+    int8_t te_code = init_token_embed(te_filepath);
     if (te_code == 0) {
         printf("%sToken embeds created...%s\n\n", GREEN, END);
     }
@@ -39,8 +33,9 @@ int main(void) {
     }
 
     // Check positional encodes
+    char pe_filepath[] = POS_ENC_DIR;
     printf("%sChecking positional encodes...%s\n", YELLOW, END);
-    int8_t pe_code = init_positional_encoding(pe_filepath, MAX_SEQ_LEN, INPUT_LAYER_DIM);
+    int8_t pe_code = init_positional_encoding(pe_filepath);
     if (pe_code == 0) {
         printf("%sPositional encodes created...%s\n\n", GREEN, END);
     }

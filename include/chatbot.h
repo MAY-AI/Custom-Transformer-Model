@@ -24,11 +24,6 @@ typedef struct {
     uint32_t float_bytes;
     uint32_t reserved;
 } file_header;
-
-// Type checks
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
-
 _Static_assert(
     sizeof(file_header) == 32,
     "File headers must be 32 bytes"
@@ -45,11 +40,22 @@ _Static_assert(
 #define BLUE   "\x1b[34m"
 #define END    "\x1b[0m"
 
+// Data directory locations
+#define TOK_EMB_DIR "./data/token_embeddings.bin"
+#define POS_ENC_DIR "./data/positional_encodings.bin"
+
 // NN params
-#define INPUT_LAYER_DIM  512u
-#define HIDDEN_LAYER_DIM 2048u
-#define VOCAB_SIZE       75000u
-#define MAX_SEQ_LEN      8192u
+#define NUM_LAYERS      96u
+#define INPUT_LAYER_DIM 12288u
+#define NUM_HEADS       96u
+#define HEAD_DIM        INPUT_LAYER_DIM / NUM_HEADS
+#define FF_DIM          4 * INPUT_LAYER_DIM
+#define VOCAB_SIZE      75000u
+#define MAX_SEQ_LEN     8192u
+_Static_assert(
+    INPUT_LAYER_DIM % NUM_HEADS == 0u,
+    "Incompatable dimensions, ensure 'INPUT_LAYER_DIM modulo NUM_HEADS = 0'"
+);
 
 // Data params
 #define TOKEN_EMBED_MAGIC   "TOKEMB01"
@@ -67,14 +73,13 @@ int8_t write_all(
     size_t bytes
 );
 int8_t init_token_embed(
-    const char *filepath,
-    const uint32_t vocab_size,
-    const uint16_t model_size
+    const char *filepath
 );
 int8_t init_positional_encoding(
-    const char *filepath,
-    const uint32_t max_seq_len,
-    const uint16_t model_size
+    const char *filepath
+);
+int8_t init_weight_bias(
+    const char *filepath
 );
 
 // End of header definiton
